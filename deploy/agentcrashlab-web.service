@@ -1,0 +1,16 @@
+[Unit]
+Description=AgentCrashLab read-only HTTP edge
+After=network-online.target agentcrashlab-judge.service
+[Service]
+Type=simple
+User=agentcrashlab-web
+Group=agentcrashlab-web
+Environment=HOME=/var/lib/agentcrashlab-web
+Environment=AGENTCRASHLAB_DOMAIN=localhost
+ExecStart=/opt/agentcrashlab/.runtime/caddy run --config /opt/agentcrashlab/deploy/Caddyfile --adapter caddyfile
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+UMask=0077
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target

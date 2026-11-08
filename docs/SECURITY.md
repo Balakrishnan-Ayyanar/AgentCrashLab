@@ -1,0 +1,13 @@
+# Trust boundaries and security limits
+
+The public judge is a separate ASGI app importing only the strict snapshot schema. It exposes GET `/api/judge`, `/api/judge/download` and `/api/judge/health`. It has no inference client, Docker socket, token, private DB or mutation route. Query parameters cannot select files. Snapshots are bounded regular files, opened without following symlinks, validated with extra fields forbidden, and served no-store. Missing/invalid data returns 503. Staleness after 48 hours is visible and does not invent new execution.
+
+The private operator app listens only on loopback. Protected APIs require a configured bearer token in every mode; unset token fails closed with 403, including behind a proxy. No token was created for the deployed operator API. Never expose it through Caddy. Synthetic fixture tokens are public test values and unsuitable for deployment. Explicit CORS is not authentication or a substitute for edge isolation.
+
+The operator controls rootful Docker on an existing repurposed host. Compromise of that service can give host-level control. Public judge/web identities must not join the Docker group or read operator secrets/state. Rootful Docker is not equivalent to a hardened multi-tenant sandbox. Worker controls are nonroot 65532, read-only root, network none, no host mounts, dropped capabilities, 64 MiB, 0.5 CPU, 16 PIDs, six-second execution and bounded output. Host-kernel/Docker flaws and hard-kill cleanup remain limitations.
+
+Provider credentials stay in the trusted operator plane and never enter the frontend, snapshot, model prompt or runner environment. All agent inference uses the allowlisted official Vultr HTTPS origin. The generic app adapter retries by default (two attempts) and has no durable account-wide quota. The completed hosted proof used a separate permanently consumed two-POST/no-retry guard. Public interaction never triggers paid requests. The separate controlled-model CLI requires explicit opt-in configuration and refuses used run state. It does not start with the web service.
+
+The app accepts bounded fixed synthetic tools and fixtures, not arbitrary uploads, shell/code, internet targets or external MCP servers. The MCP-shaped fixture is local protocol simulation. No general agent-code execution capability or arbitrary browser task is claimed.
+
+Heuristic release scans are not proof that source is free of secrets or vulnerabilities. Review the explicit allowlist and exact committed tree. Do not add private evidence, local CLI logs, credential files, account/contact data, generated media, databases or session records. Dependency registries/packages have their own trust and licensing risks. Report issues through the repository issue tracker.

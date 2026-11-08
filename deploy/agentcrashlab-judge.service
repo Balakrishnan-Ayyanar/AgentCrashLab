@@ -1,0 +1,15 @@
+[Unit]
+Description=AgentCrashLab public evidence snapshot
+
+[Service]
+Type=simple
+User=agentcrashlab-judge
+Group=agentcrashlab-judge
+WorkingDirectory=/opt/agentcrashlab
+Environment=AGENTCRASHLAB_JUDGE_SNAPSHOT=/var/lib/agentcrashlab-judge/snapshot.json
+ExecStart=/opt/agentcrashlab/.venv/bin/uvicorn backend.judge:app --host 127.0.0.1 --port 18080 --workers 1
+UMask=0077
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

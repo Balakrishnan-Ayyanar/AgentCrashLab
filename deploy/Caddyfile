@@ -1,0 +1,43 @@
+# HTTP-only template. Automatic HTTPS is disabled.
+{
+    auto_https off
+    admin off
+}
+http://{$AGENTCRASHLAB_DOMAIN} {
+    @judge_api {
+        method GET
+        path /api/judge /api/judge/download /api/judge/health
+    }
+    @private_api path /api /api/*
+    @judge_page {
+        method GET HEAD
+        path /judge
+    }
+    @assets {
+        method GET HEAD
+        path /assets/*
+    }
+    route {
+        handle @judge_api {
+            reverse_proxy 127.0.0.1:18080
+        }
+        handle @private_api {
+            respond 404
+        }
+        handle / {
+            redir /judge 302
+        }
+        handle @judge_page {
+            root * /opt/agentcrashlab/frontend/dist
+            rewrite * /index.html
+            file_server
+        }
+        handle @assets {
+            root * /opt/agentcrashlab/frontend/dist
+            file_server
+        }
+        handle {
+            respond 404
+        }
+    }
+}

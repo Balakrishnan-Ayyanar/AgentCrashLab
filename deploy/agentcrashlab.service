@@ -1,0 +1,19 @@
+[Unit]
+Description=AgentCrashLab control plane
+
+[Service]
+Type=simple
+User=agentcrashlab
+Group=agentcrashlab
+WorkingDirectory=/opt/agentcrashlab
+EnvironmentFile=/etc/agentcrashlab/agentcrashlab.env
+UMask=0077
+StateDirectory=agentcrashlab
+StateDirectoryMode=0700
+Environment=AGENTCRASHLAB_DB=/var/lib/agentcrashlab/agentcrashlab.sqlite3
+ExecStart=/opt/agentcrashlab/.venv/bin/uvicorn backend.main:app --host 127.0.0.1 --port 18081 --workers 1
+Restart=on-failure
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
